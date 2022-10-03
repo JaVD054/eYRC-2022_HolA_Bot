@@ -37,7 +37,6 @@ from math import sqrt,pi,atan2
 
 ################# ADD GLOBAL VARIABLES HERE #################
 
-global linear_vel , angular_vel , init_data , top_data
 linear_vel = 1.0
 angular_vel = 1.0
 bool_linear = False
@@ -45,6 +44,9 @@ bool_linear = False
 ##############################################################
 
 class TurtleBot:
+
+    #global variables
+    motion = ""
 
     def __init__(self):
 
@@ -70,6 +72,7 @@ class TurtleBot:
         self.pose = data
         self.pose.x = round(self.pose.x,4)
         self.pose.y = round(self.pose.y,4)
+        print(f"My turleBot is: {motion} \n{self.pose.theta:.2f}")
         if data.theta < -pi/2:
             bool_linear = True
 
@@ -94,7 +97,10 @@ class TurtleBot:
         goal_pose.x = self.pose.x
         goal_pose.y = self.pose.y - 2
 
-        distance_tolerance = 0.00001
+        distance_tolerance = 0.001
+
+        global motion       
+        motion = "Moving straight!!!"
 
         vel_msg = Twist()
 
@@ -109,7 +115,6 @@ class TurtleBot:
             vel_msg.angular.x = 0
             vel_msg.angular.y = 0
             vel_msg.angular.z = self.angular_vel(goal_pose)
-            print(f"My turleBot is: Moving straight!!! \n{self.pose.theta:.2f}")
 
             # Publishing our vel_msg
             self.velocity_publisher.publish(vel_msg)
@@ -122,8 +127,10 @@ class TurtleBot:
         vel_msg.angular.z = 0
         self.velocity_publisher.publish(vel_msg)
     
-    def circle(self):
-        global bool_linear
+    def semi_circle(self):
+        global bool_linear,motion
+        motion = "Moving in a circle!!"
+
         goal_pose = Pose()
         goal_pose.x = self.pose.x
         goal_pose.y = self.pose.y
@@ -136,7 +143,6 @@ class TurtleBot:
         vel_msg.angular.y = 0
         vel_msg.angular.z = angular_vel
         while not bool_linear:
-            print(f"My turleBot is: Moving in a circle!! \n{self.pose.theta:.2f}")
             self.velocity_publisher.publish(vel_msg)
             self.rate.sleep()
         vel_msg.linear.x = 0
@@ -144,6 +150,8 @@ class TurtleBot:
         self.velocity_publisher.publish(vel_msg)
 
     def setDesiredOrientation(self, desired_angle_radians):
+        global motion
+        motion = "Rotating!"
         tolerence = 0.000001
         vel_msg = Twist()
         vel_msg.linear.x = 0
@@ -157,7 +165,6 @@ class TurtleBot:
         else:
             vel_msg.angular.z = abs(angular_vel)
         while not (desired_angle_radians-self.pose.theta < tolerence):
-            print(f"My turleBot is: Rotating! \n{self.pose.theta:.2f}")
             self.velocity_publisher.publish(vel_msg)
 
         vel_msg.angular.z = 0
@@ -167,9 +174,9 @@ class TurtleBot:
 
 #main function
 def main():
+    input()
     turtle = TurtleBot()
-    # input()
-    turtle.circle()
+    turtle.semi_circle()
     turtle.setDesiredOrientation(-pi/2)
     turtle.move2goal()
     rospy.signal_shutdown("Done!!")
@@ -203,3 +210,4 @@ if __name__ == "__main__":
         print("------------------------------------------")
         print("    Python Script Executed Successfully   ")
         print("------------------------------------------")
+
