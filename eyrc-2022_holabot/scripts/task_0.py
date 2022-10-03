@@ -39,6 +39,7 @@ from math import sqrt,pi,atan2
 
 linear_vel = 1.0
 angular_vel = 1.0
+bool_linear = False
 
 ##############################################################
 
@@ -46,7 +47,6 @@ class TurtleBot:
 
     #global variables
     motion = ""
-    bool_linear = False
 
     def __init__(self):
 
